@@ -1,0 +1,337 @@
+﻿@page "/"
+@using System.IO;
+@using Microsoft.AspNetCore.Hosting;
+@using Identity_App.Data;
+
+@inject IWebHostEnvironment _env;
+@inject Identity_App.Data.Repository.IReporsoitory repository;
+@inject IDialogService Dialog; 
+
+<MatThemeProvider Theme="@theme1">
+
+    <div class="container-fluid">
+        <h1 class="text-center">Удаленная идентификация Салым Финанс</h1> <br>
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="top-center"><img src="image-id.jpg" class="img-fluid" width="550" height="350"></div>
+            </div>
+            <div class="col-sm-6">
+                <p style="text-align:justify">
+                    Удаленная идентификация – это процедура, которая дает возможность клиенту подключить различные услуги, не посещая офисы нашей Организации.
+
+                    Посредством удаленной идентификации, организация определяет личность человека на расстоянии и, тем самым, позволяет клиентам минимизировать физическое посещение офисов организации и получить банковские услуги в тех регионах, где рядом нет офиса Салым Финанс.
+
+                    Для Вашего удобства Салым Финанс предлагает удаленную идентификацию для следующих услуг*:
+                </p>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="container-fluid">
+        <div class="block">
+            <h2 style="text-align:center">Заполните следующую форму и выберите необходимую услугу</h2>
+        </div>
+        <EditForm Model="@cl" OnValidSubmit="@HandleValidSubmit">
+            <ObjectGraphDataAnnotationsValidator />
+            <div class="block">
+                <div class="row">
+                    <div class="col">
+
+                        <MudTextField @bind-Value="@cl.FirstName" Label="Имя" Variant="Variant.Outlined" />
+                        <ValidationMessage For="@(()=>cl.FirstName)" />
+                        <br>
+                    </div>
+                    <div class="col">
+                        <MudTextField @bind-Value="@cl.LastName" Label="Фамилия" Variant="Variant.Outlined" />
+                        <ValidationMessage For="@(()=>cl.LastName)" />
+                        <br>
+                    </div>
+                    <div class="col">
+                        <MudTextField @bind-Value="@cl.MidName" Label="Отчество" Variant="Variant.Outlined" />
+                        <ValidationMessage For="@(()=>cl.MidName)" />
+                    </div>
+                </div>
+            </div>
+            <div class="block">
+                <div class="row">
+                    <div class="col">
+                        <MudTextField @bind-Value="@cl.Number1" Label="Номер телефона" HelperText="Без '0' и '996'. Пример: 555123456" Variant="Variant.Outlined" />
+                        <ValidationMessage For="@(()=>cl.Number1)" />
+                        <br>
+                    </div>
+                    <div class="col">
+                        <MudTextField @bind-Value="@cl.Number2" Label="Номер WhatsApp" HelperText="Без '0'  и '996'. Пример: 555123456" Variant="Variant.Outlined" />
+                        <ValidationMessage For="@(()=>cl.Number2)" />
+                        <br>
+                    </div>
+                    <div class="col">
+                        Выберите услугу <span style="color:red">*</span><br>
+                        <select>
+                            <option class="" value="">Кредит</option>
+                            <option class="" value="">Деопзит</option>
+                        </select>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="block">
+                <div class="row">
+                    <div class="col">
+                        <h3>Сделайте фото паспорта с лицевой стороны и загрузите фото</h3>
+                        <p>(пример фото)</p>
+                        <div class="top-center"><img src="passport1.png" class="img-fluid"></div>
+
+                        <MatFileUpload OnChange="OnInputFileChange1" Label="Выберите или перетащите изображение..."></MatFileUpload>
+
+                        <div>@fileName1</div>
+
+                        <ValidationMessage For="@(()=>cl.Img.Pic1)" />
+
+                    </div>
+                    <div class="col">
+                        <h3>Сделайте фото паспорта с обратной стороны и загрузите фото</h3>
+                        <p>(пример фото)</p>
+                        <div class="top-center"><img src="passport2.png" class="img-fluid"></div>
+
+                        <MatFileUpload OnChange="OnInputFileChange2" Label="Выберите или перетащите изображение..."></MatFileUpload>
+
+                        <div>@fileName2</div>
+
+                        <ValidationMessage For="@(()=>cl.Img.Pic1)" />
+                    </div>
+                    <div class="col">
+                        <h3>Сделайте ваше личное фото с паспоротом в руке и загрузите фото</h3>
+                        <p>(пример фото)</p>
+                        <div class="top-center"><img src="passport3.png" class="img-fluid"></div>
+
+                        <MatFileUpload OnChange="OnInputFileChange3" Label="Выберите или перетащите изображение..."></MatFileUpload>
+
+                     
+                        <div>@fileName3</div>
+                       
+                
+                        <ValidationMessage For="@(()=>cl.Img.Pic1)" />
+                    </div>
+                </div>
+                <br />
+                <MatButton Raised="true">Send</MatButton>
+            </div>
+        </EditForm>
+    </div>
+</MatThemeProvider>
+
+@code {
+
+
+    Client cl = new Client();
+
+    public string Myguid;
+    public bool License;
+    public string fileName1;
+    public string fileName2;
+    public string fileName3;
+
+
+    //Custom theme for MatBlazor
+    MatTheme theme1 = new MatTheme()
+    {
+        Primary = "#e0292f",
+        Secondary = "#e0292f"
+    };
+
+    //Validation
+    async Task HandleValidSubmit()
+    {
+        cl.Satus = 0;
+        cl.DateTime = DateTime.Now;
+        await OpenDialog();
+        if(License == true)
+        {
+            repository.AddToDB(cl, cl.Img);
+            cl = new Client();
+            cl.Img = new Img();
+            fileName1 = string.Empty;
+            fileName2 = string.Empty;
+            fileName3 = string.Empty;
+        }
+
+    }
+
+    //Dialog
+
+    bool license_accepted = false;
+
+    async Task OpenDialog()
+    {
+        var result = await Dialog.Show<Dialog>("MudBlazor License").Result;
+
+        if (!result.Cancelled)
+        {
+            license_accepted = (bool)(result.Data ?? false);
+            License = true;
+        }
+        else
+            License = false;
+    }
+
+
+    //Image upload logic
+    const int maxFileSize = 10485760;
+
+
+    private string CreateGuid(string Newguid = null)
+    {
+        if (Newguid == null)
+        {
+            Newguid = Guid.NewGuid().ToString();
+        }
+        return Newguid;
+
+    }
+
+    /*
+    private async Task<byte[]> SaveFile(IBrowserFile file, string guid)
+    {
+        var relativePath = Path.Combine("uploads", guid);
+        var dirToSave = Path.Combine(_env.WebRootPath, relativePath);
+        var di = new DirectoryInfo(dirToSave);
+        if (!di.Exists)
+        {
+            di.Create();
+        }
+
+        var filePath = Path.Combine(dirToSave, file.Name);
+        using (var stream = file.OpenReadStream(maxFileSize))
+        {
+            using (var mstream = new MemoryStream())
+            {
+                await stream.CopyToAsync(mstream);
+                await File.WriteAllBytesAsync(filePath, mstream.ToArray());
+                return mstream.ToArray();
+            }
+        }
+    }
+    */
+
+    async Task OnInputFileChange1(IMatFileUploadEntry[] e)
+    {
+        try
+        {
+            var res = await SaveFile(e);
+            cl.Img.Pic1 = res.img;
+            cl.Img.PicPath1 = res.path;
+            var file = e.FirstOrDefault();
+            fileName1 = file.Name;
+
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine(ex.Message);
+            throw;
+        }
+    }
+
+    async Task OnInputFileChange2(IMatFileUploadEntry[] e)
+    {
+        try
+        {
+            var res = await SaveFile(e);
+            cl.Img.Pic2 = res.img;
+            cl.Img.PicPath2 = res.path;
+            var file = e.FirstOrDefault();
+            fileName2 = file.Name;
+
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine(ex.Message);
+            throw;
+        }
+    }
+
+    async Task OnInputFileChange3(IMatFileUploadEntry[] e)
+    {
+        try
+        {
+            var res = await SaveFile(e);
+            cl.Img.Pic3 = res.img;
+            cl.Img.PicPath3 = res.path;
+            var file = e.FirstOrDefault();
+            fileName3 = file.Name;
+
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine(ex.Message);
+            throw;
+        }
+    }
+
+    private async Task<(byte[] img , string path)> SaveFile(IMatFileUploadEntry[] files)
+    {
+
+        if (Myguid == null)
+        {
+            Myguid = CreateGuid();
+            var file = files.FirstOrDefault();
+            var relativePath = Path.Combine("uploads", Myguid);
+            var dirToSave = Path.Combine(_env.WebRootPath, relativePath);
+            var di = new DirectoryInfo(dirToSave);
+            if (!di.Exists)
+            {
+                di.Create();
+            }
+            var ms = new MemoryStream();
+            var filePath = Path.Combine(dirToSave, file.Name);
+            if (file != null)
+            {
+                await file.WriteToStreamAsync(ms);
+                await File.WriteAllBytesAsync(filePath, ms.ToArray());
+            }
+            //UploadImg = ms.ToArray();
+            var result = (ms.ToArray(), filePath);
+            return result;
+            //isValidPic1 = true;
+        }
+        else
+        {
+            var file = files.FirstOrDefault();
+            var relativePath = Path.Combine("uploads", Myguid);
+            var dirToSave = Path.Combine(_env.WebRootPath, relativePath);
+            var di = new DirectoryInfo(dirToSave);
+            if (!di.Exists)
+            {
+                di.Create();
+            }
+            var ms = new MemoryStream();
+            var filePath = Path.Combine(dirToSave, file.Name);
+            if (file != null)
+            {
+                await file.WriteToStreamAsync(ms);
+                await File.WriteAllBytesAsync(filePath, ms.ToArray());
+            }
+            var result = (ms.ToArray(), filePath);
+            return result;
+            // img.Pic1 = ms.ToArray();
+            //isValidPic1 = true;
+        }
+
+    }
+
+    private string DeleteImg(int pos)
+    {
+        repository.DeleteImg(pos);
+        return "фото было удалено";
+    }
+
+
+
+}
+
+
+
+
+
+
