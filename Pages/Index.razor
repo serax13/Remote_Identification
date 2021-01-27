@@ -191,30 +191,6 @@
 
     }
 
-    /*
-    private async Task<byte[]> SaveFile(IBrowserFile file, string guid)
-    {
-        var relativePath = Path.Combine("uploads", guid);
-        var dirToSave = Path.Combine(_env.WebRootPath, relativePath);
-        var di = new DirectoryInfo(dirToSave);
-        if (!di.Exists)
-        {
-            di.Create();
-        }
-
-        var filePath = Path.Combine(dirToSave, file.Name);
-        using (var stream = file.OpenReadStream(maxFileSize))
-        {
-            using (var mstream = new MemoryStream())
-            {
-                await stream.CopyToAsync(mstream);
-                await File.WriteAllBytesAsync(filePath, mstream.ToArray());
-                return mstream.ToArray();
-            }
-        }
-    }
-    */
-
     async Task OnInputFileChange1(IMatFileUploadEntry[] e)
     {
         try
@@ -275,48 +251,24 @@
         if (Myguid == null)
         {
             Myguid = CreateGuid();
-            var file = files.FirstOrDefault();
-            var relativePath = Path.Combine("uploads", Myguid);
-            var dirToSave = Path.Combine(_env.WebRootPath, relativePath);
-            var di = new DirectoryInfo(dirToSave);
-            if (!di.Exists)
-            {
-                di.Create();
-            }
-            var ms = new MemoryStream();
-            var filePath = Path.Combine(dirToSave, file.Name);
-            if (file != null)
-            {
-                await file.WriteToStreamAsync(ms);
-                await File.WriteAllBytesAsync(filePath, ms.ToArray());
-            }
-            //UploadImg = ms.ToArray();
-            var result = (ms.ToArray(), filePath);
-            return result;
-            //isValidPic1 = true;
         }
-        else
+        var file = files.FirstOrDefault();
+        var relativePath = Path.Combine("uploads", Myguid);
+        var dirToSave = Path.Combine(_env.WebRootPath, relativePath);
+        var di = new DirectoryInfo(dirToSave);
+        if (!di.Exists)
         {
-            var file = files.FirstOrDefault();
-            var relativePath = Path.Combine("uploads", Myguid);
-            var dirToSave = Path.Combine(_env.WebRootPath, relativePath);
-            var di = new DirectoryInfo(dirToSave);
-            if (!di.Exists)
-            {
-                di.Create();
-            }
-            var ms = new MemoryStream();
-            var filePath = Path.Combine(dirToSave, file.Name);
-            if (file != null)
-            {
-                await file.WriteToStreamAsync(ms);
-                await File.WriteAllBytesAsync(filePath, ms.ToArray());
-            }
-            var result = (ms.ToArray(), filePath);
-            return result;
-            // img.Pic1 = ms.ToArray();
-            //isValidPic1 = true;
+            di.Create();
         }
+        var ms = new MemoryStream();
+        var filePath = Path.Combine(dirToSave, file.Name);
+        if (file != null)
+        {
+            await file.WriteToStreamAsync(ms);
+            await File.WriteAllBytesAsync(filePath, ms.ToArray());
+        }
+        var result = (ms.ToArray(), filePath);
+        return result;
 
     }
 
