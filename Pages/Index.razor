@@ -116,7 +116,7 @@
                     </div>
                 </div>
                 <br />
-                <MatButton Raised="true">Send</MatButton>
+                <MatButton Raised="true">Отправить</MatButton>
             </div>
         </EditForm>
     </div>
@@ -165,7 +165,7 @@
 
     async Task OpenDialog()
     {
-        var result = await Dialog.Show<Dialog>("MudBlazor License").Result;
+        var result = await Dialog.Show<Dialog>("Согласие субъекта на сбор, обработку и передачу персональных данных").Result;
 
         if (!result.Cancelled)
         {
