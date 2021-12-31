@@ -1,0 +1,240 @@
+﻿@using System.Net
+@using System.Text
+@inject NavigationManager navigationManager
+
+<MudDialog>
+    <DialogContent>
+        <MudContainer Style="max-height: 550px; max-width: inherit; overflow-y: auto">
+            @if (Loading)
+            {
+                <MudProgressCircular Indeterminate="true"></MudProgressCircular>
+            }
+            else
+            {
+                <MudContainer Class="d-flex" MaxWidth="MaxWidth.ExtraLarge">
+                    <MudGrid Spacing="4" Class="d-flex">
+                        <MudItem xs="12">
+                            <MudGrid>
+                                <MudItem xs="12">
+                                    <MudText Typo="Typo.h5" GutterBottom="true">Персональные данные</MudText>
+                                </MudItem>
+                                <MudItem xs="4">
+                                    @*<MudTooltip>
+                                        <ChildContent>*@
+                                            <MudTextField T="string" @bind-Value="Client.FirstName" Label="Имя" />
+                                        @*</ChildContent>
+                                        <MubBlazor.TooltipContent>
+
+                                        </MubBlazor.TooltipContent>
+                                    </MudTooltip>*@
+
+
+                                </MudItem>
+                                <MudItem xs="4">
+                                    <MudTextField T="string" @bind-Value="Client.LastName" Label="Фамилия" />
+                                </MudItem>
+                                <MudItem xs="4">
+                                    <MudTextField T="string" @bind-Value="Client.MidName" Label="Отчество" />
+                                </MudItem>
+
+                                <MudItem xs="4">
+                                    <MudDatePicker Label="Дата рождения" @bind-Date="Client.Birthday" InputVariant="Variant.Outlined" HelperText="Выберите дату" Editable="true" DateFormat="dd/MM/yyyy" />
+                                </MudItem>
+                                <MudItem xs="4">
+                                    <MudSelect T="string" @bind-Value="Client.Region" Label="Область" Strict="true" Variant="Variant.Outlined" Format="F2">
+                                        <MudSelectItem T="string" Value="@("Чуйская")" />
+                                        <MudSelectItem T="string" Value="@("Таласская")" />
+                                        <MudSelectItem T="string" Value="@("Иссык-Кульская")" />
+                                        <MudSelectItem T="string" Value="@("Нарынская")" />
+                                        <MudSelectItem T="string" Value="@("Джалал-Абадская")" />
+                                        <MudSelectItem T="string" Value="@("Ошская")" />
+                                        <MudSelectItem T="string" Value="@("Баткенская")" />
+                                    </MudSelect>
+                                </MudItem>
+                                <MudItem xs="4">
+                                    <MudTextField @bind-Value="@Client.City" Label="Город" Variant="Variant.Outlined" />
+                                </MudItem>
+
+
+                                <MudItem xs="4">
+                                    <MudTextField @bind-Value="@Client.Street" Label="Улица" Variant="Variant.Outlined" />
+                                </MudItem>
+                                <MudItem xs="4">
+                                    <MudAutocomplete T="string" Label="Район" @bind-Value="Client.District" Variant="Variant.Outlined" />
+                                </MudItem>
+                                <MudItem xs="4">
+                                    <MudTextField @bind-Value="@Client.HouseNumber" Label="Дом" Variant="Variant.Outlined" />
+                                </MudItem>
+
+
+                                <MudItem xs="4">
+                                    <MudTextField @bind-Value="@Client.AparmentNumber" Label="Номер квартиры" Variant="Variant.Outlined" />
+                                </MudItem>
+                                <MudItem xs="4" Class="d-flex justify-center">
+                                    <MudSelect T="string" Label="Пол" @bind-Value="Client.Gender" Strict="true" Variant="Variant.Outlined" Format="F2">
+                                        <MudSelectItem T="string" Value="@("Муж.")" />
+                                        <MudSelectItem T="string" Value="@("Жен.")" />
+                                    </MudSelect>
+                                </MudItem>
+                                <MudItem xs="4" Class="d-flex justify-center">
+                                    <MudSelect T="string" @bind-Value="Client.MartialStatus" Label="Семейное положение" Strict="true" Variant="Variant.Outlined" Format="F2">
+                                        <MudSelectItem T="string" Value="@("Холост")" />
+                                        <MudSelectItem T="string" Value="@("Не замужем")" />
+                                        <MudSelectItem T="string" Value="@("Женат")" />
+                                        <MudSelectItem T="string" Value="@("Замужем")" />
+                                        <MudSelectItem T="string" Value="@("Разведен")" />
+                                        <MudSelectItem T="string" Value="@("Разведена")" />
+                                        <MudSelectItem T="string" Value="@("Гражданский брак")" />
+                                    </MudSelect>
+                                </MudItem>
+
+
+                                <MudItem xs="12">
+                                    <MudText Typo="Typo.h5" GutterBottom="true">Паспортные данные</MudText>
+                                </MudItem>
+
+                                <MudItem xs="4">
+                                    <MudTextField @bind-Value="@Client.PassportSeries" Label="Серия паспорта" Variant="Variant.Outlined" />
+                                </MudItem>
+                                <MudItem xs="4">
+                                    <MudTextField @bind-Value="@Client.PassportNumber" Label="Номер паспорта" Variant="Variant.Outlined" />
+                                </MudItem>
+                                <MudItem xs="4">
+                                    <MudTextField @bind-Value="@Client.PassportInn" Label="ИНН паспорта" Variant="Variant.Outlined" />
+                                </MudItem>
+
+
+                                <MudItem xs="4">
+                                    <MudDatePicker Label="Дата выдачи" @bind-Date="Client.PassportDate" InputVariant="Variant.Outlined" HelperText="Выберите дату" Editable="true" DateFormat="dd/MM/yyyy" />
+                                </MudItem>
+                                <MudItem xs="4">
+                                    <MudDatePicker Label="Дата окончания" @bind-Date="Client.PassportEndDate" InputVariant="Variant.Outlined" HelperText="Выберите дату" Editable="true" DateFormat="dd/MM/yyyy" />
+                                </MudItem>
+                                <MudItem xs="4">
+                                    <MudTextField @bind-Value="@Client.PassportIssuedBy" Label="Орган выдачи" HelperText="Пример: МКК 50-00" Variant="Variant.Outlined" />
+                                </MudItem>
+
+
+
+                                <MudItem xs="12">
+                                    <MudCheckBox @bind-Checked="Label_CheckBox" Label="Адрес прописки совпадает с фактическим адресом" Color="Color.Primary"></MudCheckBox>
+                                </MudItem>
+
+                                @if (!Label_CheckBox)
+                                {
+                                    <MudItem xs="4">
+                                        <MudSelect T="string" @bind-Value="Client.PassportRegion" Label="Область" Strict="true" Variant="Variant.Outlined" Format="F2">
+                                            <MudSelectItem T="string" Value="@("Чуйская")" />
+                                            <MudSelectItem T="string" Value="@("Таласская")" />
+                                            <MudSelectItem T="string" Value="@("Иссык-Кульская")" />
+                                            <MudSelectItem T="string" Value="@("Нарынская")" />
+                                            <MudSelectItem T="string" Value="@("Джалал-Абадская")" />
+                                            <MudSelectItem T="string" Value="@("Ошская")" />
+                                            <MudSelectItem T="string" Value="@("Баткенская")" />
+                                        </MudSelect>
+                                    </MudItem>
+                                    <MudItem xs="4">
+                                        <MudAutocomplete T="string" Label="Район" @bind-Value="Client.PassportDistrict" Variant="Variant.Outlined" />
+                                    </MudItem>
+                                    <MudItem xs="4">
+                                        <MudTextField @bind-Value="@Client.PassportCity" Label="Город" Variant="Variant.Outlined" />
+                                    </MudItem>
+
+
+                                    <MudItem xs="4">
+                                        <MudTextField @bind-Value="@Client.PassportStreet" Label="Улица" Variant="Variant.Outlined" />
+                                    </MudItem>
+                                    <MudItem xs="4">
+                                        <MudTextField @bind-Value="@Client.PassportHouseNumber" Label="Дом" Variant="Variant.Outlined" />
+                                    </MudItem>
+                                    <MudItem xs="4">
+                                        <MudTextField @bind-Value="@Client.PassportAparmentNumber" Label="Квартира" Variant="Variant.Outlined" />
+                                    </MudItem>
+                                }
+
+
+                                <MudItem xs="12">
+                                    <MudText Typo="Typo.h5" GutterBottom="true">Фото</MudText>
+                                </MudItem>
+
+                                <MudItem xs="4">
+                                    <MudTextField @bind-Value="@Client.Number1" Label="Номер телефона" Variant="Variant.Outlined" />
+                                </MudItem>
+                                <MudItem xs="4">
+                                    <MudTextField @bind-Value="@Client.Number2" Label="Номер WhatsApp" Variant="Variant.Outlined" />
+                                </MudItem>
+                                <MudItem xs="4">
+                                    <MudSelect T="string" Label="Выберите услугу" Strict="true" Variant="Variant.Outlined" Format="F2">
+                                        <MudSelectItem T="string" Value="@("Кредит")" />
+                                        <MudSelectItem T="string" Value="@("Депозит")" />
+                                    </MudSelect>
+                                </MudItem>
+                                <MudItem xs="4">
+                                    <MudSelect T="int" @bind-Value="Client.Status" Label="Статус заявки" Strict="true" Variant="Variant.Outlined" Format="F2">
+                                        <MudSelectItem T="int" Value="@(3)">Не принята</MudSelectItem>
+                                        <MudSelectItem T="int" Value="@(1)">Принята</MudSelectItem>
+                                    </MudSelect>
+                                </MudItem>
+
+                                <MudItem xs="12">
+                                    <img src="data:image;base64,@System.Convert.ToBase64String(Client.Img.Pic1)" width="600" height="400" />
+                                </MudItem>
+                                <MudItem xs="12">
+                                    <img src="data:image;base64,@System.Convert.ToBase64String(Client.Img.Pic2)" width="600" height="400" />
+                                </MudItem>
+                                <MudItem xs="12">
+                                    <img src="data:image;base64,@System.Convert.ToBase64String(Client.Img.Pic3)" width="600" height="400" />
+                                </MudItem>
+
+                                <MudButton OnClick="Cancel">Закрыть</MudButton>
+                                <MudButton Color="Color.Primary" OnClick="Submit">Сохранить</MudButton>
+                            </MudGrid>
+                        </MudItem>
+                    </MudGrid>
+                </MudContainer>
+            }
+        </MudContainer>
+    </DialogContent>
+    <DialogActions>
+        
+    </DialogActions>
+</MudDialog>
+
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [Inject]
+    IClientService ClientService { get; set; }
+
+    [Parameter]
+    public int ClientId { get; set; }
+
+    public Client Client { get; set; }
+
+    public bool Label_CheckBox { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        Loading = true;
+
+        Client = await ClientService.GetById("api/clients/", ClientId);
+        //string path1 = Client.Img.PicPath1;
+        //string path2 = Client.Img.PicPath2;
+        //string path3 = Client.Img.PicPath2;
+        Loading = false;
+    }
+
+    private bool Loading = false;
+
+    async void Submit()
+    {
+        await ClientService.UpdateClient("api/clients/", Client);
+        //StateHasChanged();
+        MudDialog.Close(DialogResult.Ok(true));
+        navigationManager.NavigateTo("refresh");
+
+
+    }
+    void Cancel() => MudDialog.Cancel();
+}

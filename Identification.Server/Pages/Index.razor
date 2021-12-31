@@ -1,0 +1,501 @@
+﻿@page "/"
+@using Identification.Server.Services
+@using Microsoft.AspNetCore.Hosting
+@using Microsoft.Extensions.Options
+@using Microsoft.Extensions.Logging
+@using System
+@using System.Threading
+
+@implements IDisposable
+
+
+@inject IOptions<ReCAPTCHASettings> GoogleReCAPT
+@inject HttpClient Http
+@inject ISnackbar Snackbar
+@inject IWebHostEnvironment _env
+@inject IJSRuntime JsRuntime
+@inject NavigationManager NavigationManager
+@inject ProtectedSessionStorage ProtectedSessionStore
+@inject IDialogService DialogService
+
+<MatThemeProvider Theme="@theme1">
+    <MudContainer Class="mt-16" MaxWidth="MaxWidth.Large">
+        @*<h1 class="text-center">Онлайн заявка на получение кредита</h1> <br>*@
+        @*<div class="row">
+            <div class="col-sm-6">
+                <div class="top-center"><img src="image-id.jpg" class="img-fluid" width="550" height="350"></div>
+            </div>
+            <div class="col-sm-6">
+                <p style="text-align:justify">
+                    Удаленная идентификация – это процедура, которая дает возможность клиенту подключить различные услуги, не посещая офисы нашей Организации.
+
+                    Посредством удаленной идентификации, организация определяет личность человека на расстоянии и, тем самым, позволяет клиентам минимизировать физическое посещение офисов организации и получить банковские услуги в тех регионах, где рядом нет офиса Салым Финанс.
+
+                    Для Вашего удобства Салым Финанс предлагает удаленную идентификацию для следующих услуг*:
+                </p>
+            </div>
+        </div>*@
+        <br />
+        <MudContainer Class="mt-16" MaxWidth="MaxWidth.Medium">
+            <MudText Typo="Typo.h3" Align="Align.Center" GutterBottom="true">Онлайн заявка на получение кредита</MudText>
+            <MudGrid Spacing="6" Class="mt-16">
+                <MudItem xs="7">
+                    <MudText Typo="Typo.h5" GutterBottom="true">Billing address</MudText>
+                    <MudGrid>
+                        <MudItem xs="12">
+                            <MudTextField T="string" Label="Email" Variant="Variant.Outlined" />
+                        </MudItem>
+                        <MudItem xs="12">
+                            <MudTextField T="string" Label="Mobile number" Variant="Variant.Outlined" />
+                        </MudItem>
+                        <MudItem xs="12">
+                            <MudTextField T="string" Label="Personal number" Variant="Variant.Outlined" />
+                        </MudItem>
+                        <MudItem xs="6">
+                            <MudTextField T="string" Label="First name" Variant="Variant.Outlined" />
+                        </MudItem>
+                        <MudItem xs="6">
+                            <MudTextField T="string" Label="Last name" Variant="Variant.Outlined" />
+                        </MudItem>
+                        <MudItem xs="12">
+                            <MudTextField T="string" Label="Address" Variant="Variant.Outlined" />
+                        </MudItem>
+                        <MudItem xs="6">
+                            <MudTextField T="string" Label="Postal code" Variant="Variant.Outlined" />
+                        </MudItem>
+                        <MudItem xs="6">
+                            <MudTextField T="string" Label="Postal Area" Variant="Variant.Outlined" />
+                        </MudItem>
+                        <MudItem xs="12" Class="d-flex justify-center">
+                            <MudButton Variant="Variant.Filled" DisableElevation="true" Color="Color.Primary" Size="Size.Large" Class="mt-8">Continue to Payment</MudButton>
+                        </MudItem>
+                    </MudGrid>
+                </MudItem>
+                <MudItem xs="5">
+                    <MudText Typo="Typo.h5" GutterBottom="true">Cart</MudText>
+                    <MudPaper Class="d-flex flex-column" Style="height:100%;" Outlined="true">
+                        <MudList Clickable="true">
+                            <MudListItem Icon="@Icons.Material.Filled.ContentCut">
+                                <div class="d-flex">
+                                    <MudText>Scissor - Big</MudText>
+                                    <MudText Inline="true" Class="ml-auto">$5</MudText>
+                                </div>
+                            </MudListItem>
+                            <MudListItem Icon="@Icons.Material.Filled.AirplanemodeActive">
+                                <div class="d-flex">
+                                    <MudText>Model Airplane</MudText>
+                                    <MudText Class="ml-auto">$20</MudText>
+                                </div>
+                            </MudListItem>
+                            <MudListItem Icon="@Icons.Material.Filled.Create">
+                                <div class="d-flex">
+                                    <MudText>Plastic Glue</MudText>
+                                    <MudText Class="ml-auto">$12</MudText>
+                                </div>
+                            </MudListItem>
+                            <MudListItem Icon="@Icons.Material.Filled.ColorLens">
+                                <div class="d-flex">
+                                    <MudText>Color set - Modern planes</MudText>
+                                    <MudText Class="ml-auto">$16</MudText>
+                                </div>
+                            </MudListItem>
+                        </MudList>
+                        <div class="mt-auto">
+                            <MudDivider />
+                            <div class="d-flex pa-4">
+                                <MudText>Total:</MudText>
+                                <MudText Class="ml-auto"><b>$53</b></MudText>
+                            </div>
+                        </div>
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+        </MudContainer>
+        <!--<EditForm Model="@Client">
+            <FluentValidationValidator @ref="validator" DisableAssemblyScanning="@true" />
+            <MudTabs @ref="tabs" Centered="true" Rounded="true" Class="mt-4">
+
+
+                <MudTabPanel Text="Персональные данные" Icon="@Icons.Material.Filled.TextSnippet" Disabled="false" @ref="panel01">
+
+
+                    <div class="block">
+                        <div class="row">
+                            <div class="col-sm">
+                                <MudTextField @bind-Value="@Client.FirstName" Label="Имя" Variant="Variant.Outlined" TextChanged="SaveState" />
+                                <ValidationMessage For="@(()=>Client.FirstName)" />
+                                <br>
+                            </div>
+                            <div class="col-sm">
+                                <label>Сумма: @Client.CreditSum KGS</label>
+                                <MatSlider @bind-Value="@Client.CreditSum" Step="1000" EnableStep="true" ValueMin="2000" ValueMax="100000" Markers="true" TValue="decimal">Сумма: @Client.CreditSum KGS</MatSlider>
+                            </div>
+
+
+                        </div>
+                        <div class="row">
+                            <div class="col-sm">
+                                <MudTextField @bind-Value="@Client.LastName" Label="Фамилия" Variant="Variant.Outlined" TextChanged="SaveState" />
+                                <ValidationMessage For="@(()=>Client.LastName)" />
+                                <br>
+                            </div>
+                            <div class="col-sm">
+                                <label>Количество месяцев: @Client.CreditTime</label>
+                                <MatSlider @bind-Value="@Client.CreditTime" Step="1" EnableStep="true" ValueMin="1" ValueMax="36" Markers="true" TValue="int">Сумма: @Client.CreditTime</MatSlider>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm">
+                                <MudTextField @bind-Value="@Client.MidName" Label="Отчество" Variant="Variant.Outlined" TextChanged="SaveState" />
+                                <ValidationMessage For="@(()=>Client.MidName)" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm">
+                                <MudTextField @bind-Value="@Client.PassportInn" Label="ИНН паспорта" HelperText="14 цифр" Variant="Variant.Outlined" TextChanged="SaveState" />
+                                <ValidationMessage For="@(()=>Client.PassportInn)" />
+                                <br>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm">
+                                <MudTextField @bind-Value="@Client.Number1" Label="Номер телефона" HelperText="Без '0' и '996'. Пример: 555123456" Variant="Variant.Outlined" TextChanged="SaveState" />
+                                <ValidationMessage For="@(()=>Client.Number1)" />
+                                <br>
+                            </div>
+                        </div>
+
+
+
+
+                        <div class="row">
+
+
+
+                        </div>
+
+
+                        <div class="row">
+
+                        </div>
+
+                    </div>
+
+                    <div class="block">
+                        <div class="row">
+                            <MudCheckBox @bind-Checked="Label_CheckBox" Label="Адрес прописки совпадает с фактическим адресом" Color="Color.Primary"></MudCheckBox>
+                        </div>
+
+                        @if (Label_CheckBox == false)
+                        {
+                            <div class="row">
+
+                                <div class="col-sm">
+                                    <MudSelect T="string" @bind-Value="Client.Region" Label="Область" Strict="true" Variant="Variant.Outlined" Format="F2">
+                                        <MudSelectItem T="string" Value="@("Чуйская")" />
+                                        <MudSelectItem T="string" Value="@("Таласская")" />
+                                        <MudSelectItem T="string" Value="@("Иссык-Кульская")" />
+                                        <MudSelectItem T="string" Value="@("Нарынская")" />
+                                        <MudSelectItem T="string" Value="@("Джалал-Абадская")" />
+                                        <MudSelectItem T="string" Value="@("Ошская")" />
+                                        <MudSelectItem T="string" Value="@("Баткенская")" />
+                                    </MudSelect>
+                                    <ValidationMessage For="@(() => Client.Region)" />
+                                </div>
+                                <div class="col-sm">
+                                    <MudAutocomplete T="string" Label="Район" @bind-Value="Client.District" SearchFunc="@Search1"
+                                                     ResetValueOnEmptyText="true"
+                                                     CoerceText="true" CoerceValue="true"
+                                                     AdornmentIcon="@Icons.Material.Filled.Search" Variant="Variant.Outlined" AdornmentColor="Color.Primary" />
+                                    <ValidationMessage For="@(() => Client.District)" />
+                                    <br>
+                                </div>
+                                <div class="col-sm">
+                                    <MudTextField @bind-Value="@Client.City" Label="Город" Variant="Variant.Outlined" TextChanged="SaveState" />
+                                    <ValidationMessage For="@(() => Client.City)" />
+                                    <br>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm">
+                                    <MudTextField @bind-Value="@Client.Street" Label="Улица" Variant="Variant.Outlined" TextChanged="SaveState" />
+                                    <ValidationMessage For="@(() => Client.Street)" />
+                                    <br>
+                                </div>
+                                <div class="col-sm">
+                                    <MudTextField @bind-Value="@Client.HouseNumber" Label="Дом" Variant="Variant.Outlined" TextChanged="SaveState" />
+                                    <ValidationMessage For="@(() => Client.HouseNumber)" />
+                                    <br>
+                                </div>
+                                <div class="col-sm">
+                                    <MudTextField @bind-Value="@Client.AparmentNumber" Label="Номер квартиры" Variant="Variant.Outlined" TextChanged="SaveState" />
+                                    <ValidationMessage For="@(() => Client.AparmentNumber)" />
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            Client.Region = Client.PassportRegion;
+                            Client.District = Client.PassportDistrict;
+                            Client.City = Client.PassportCity;
+                            Client.Street = Client.PassportStreet;
+                            Client.HouseNumber = Client.PassportHouseNumber;
+                            Client.AparmentNumber = Client.PassportAparmentNumber;
+                        }
+                    </div>
+
+                    <div class="block">
+                        <MudButton Variant="@Variant.Filled" Color="Color.Primary" OnClick="() => Activate(panel01)">Назад</MudButton>
+                        <MudButton OnClick="PartialSubmitValidForm2" Variant="@Variant.Filled" Color="Color.Primary">Далее</MudButton>
+                    </div>
+
+                </MudTabPanel>
+
+                <MudTabPanel Text="Паспортные данные" Icon="@Icons.Material.Filled.ContactMail" @ref="panel01">-->
+
+
+                    @*@if (confirmDialog == false)
+                    {
+                        <div class="block">
+                            <h>Введите свой ИНН для проверки</h>
+                        </div>
+                        <div class="block">
+                            <div class="col-5">
+                                <MudTextField @bind-Value="@Client.PassportInn" Label="ИНН паспорта" HelperText="14 цифр" Variant="Variant.Outlined" TextChanged="SaveState" />
+                                <ValidationMessage For="@(()=>Client.PassportInn)" />
+                                <br>
+                            </div>
+                        </div>
+
+                        <div class="block">
+                            <MudButton @onclick="CheckClientInn" Variant="@Variant.Filled" Color="Color.Primary">Отправить</MudButton>
+                        </div>
+                    }*@
+                    @*@if (confirmDialog == true)
+                    {*@
+                    <!--<div class="block">
+                        <div class="row">
+
+                            <div class="col-sm">
+                                <MudTextField @bind-Value="@Client.PassportInn" Label="ИНН паспорта" HelperText="14 цифр" Variant="Variant.Outlined" TextChanged="SaveState" />
+                                <ValidationMessage For="@(()=>Client.PassportInn)" />
+                                <br>
+                            </div>
+
+                            <div class="col-sm">
+                                <MudSelect T="string" Label="Серия паспорта" @bind-Value="Client.PassportSeries" Strict="true" Variant="Variant.Outlined" Format="F2" SelectedValuesChanged="SaveState">
+                                    <MudSelectItem T="string" Value="@("ID")" />
+                                    <MudSelectItem T="string" Value="@("AN")" />
+                                </MudSelect>
+                                <ValidationMessage For="@(()=>Client.PassportSeries)" />
+                            </div>
+                            <div class="col-sm">
+                                <MudTextField @bind-Value="@Client.PassportNumber" Label="Номер паспорта" HelperText="7 цифр" Variant="Variant.Outlined" TextChanged="SaveState" />
+                                <ValidationMessage For="@(()=>Client.PassportNumber)" />
+                                <br>
+                            </div>
+
+                        </div>
+                        <div class="row">
+
+                            <div class="col-sm">
+                                <MudDatePicker Label="Дата выдачи" @bind-Date="Client.PassportDate" InputVariant="Variant.Outlined" HelperText="Выберите дату" Editable="true" DateFormat="dd/MM/yyyy" />
+                                <ValidationMessage For="@(()=>Client.PassportDate)" />
+                                <br>
+                            </div>
+                            <div class="col-sm">
+                                <MudDatePicker Label="Дата окончания" @bind-Date="Client.PassportEndDate" InputVariant="Variant.Outlined" HelperText="Выберите дату" Editable="true" DateFormat="dd/MM/yyyy" />
+                                <ValidationMessage For="@(()=>Client.PassportEndDate)" />
+                                <br>
+                            </div>
+                            <div class="col-sm">
+                                <MudTextField @bind-Value="@Client.PassportIssuedBy" Label="Орган выдачи" HelperText="Пример: МКК 50-00" Variant="Variant.Outlined" TextChanged="SaveState" />
+                                <ValidationMessage For="@(()=>@Client.PassportIssuedBy)" />
+                                <br>
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-sm">
+                            <p>Адрес прописки</p>
+                        </div>
+
+                        <div class="row">
+
+                            <div class="col-sm">
+                                <MudSelect T="string" @bind-Value="Client.PassportRegion" Label="Область" Strict="true" Variant="Variant.Outlined" Format="F2" SelectedValuesChanged="SaveState">
+                                    <MudSelectItem T="string" Value="@("Чуйская")" />
+                                    <MudSelectItem T="string" Value="@("Таласская")" />
+                                    <MudSelectItem T="string" Value="@("Иссык-Кульская")" />
+                                    <MudSelectItem T="string" Value="@("Нарынская")" />
+                                    <MudSelectItem T="string" Value="@("Джалал-Абадская")" />
+                                    <MudSelectItem T="string" Value="@("Ошская")" />
+                                    <MudSelectItem T="string" Value="@("Баткенская")" />
+                                </MudSelect>
+                                <ValidationMessage For="@(()=>Client.PassportRegion)" />
+                            </div>
+                            <div class="col-sm">
+                                <MudAutocomplete T="string" Label="Район" @bind-Value="Client.PassportDistrict" SearchFunc="Search1" ResetValueOnEmptyText="true" CoerceText="true" Variant="Variant.Outlined" />
+                                <ValidationMessage For="@(()=>Client.PassportDistrict)" />
+                                <br>
+                            </div>
+                            <div class="col-sm">
+                                <MudTextField @bind-Value="@Client.PassportCity" Label="Город" Variant="Variant.Outlined" TextChanged="SaveState" />
+                                <ValidationMessage For="@(()=>Client.PassportCity)" />
+                                <br>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm">
+                                <MudTextField @bind-Value="@Client.PassportStreet" Label="Улица" Variant="Variant.Outlined" TextChanged="SaveState" />
+                                <ValidationMessage For="@(()=>Client.PassportStreet)" />
+                                <br>
+                            </div>
+                            <div class="col-sm">
+                                <MudTextField @bind-Value="@Client.PassportHouseNumber" Label="Дом" Variant="Variant.Outlined" TextChanged="SaveState" />
+                                <ValidationMessage For="@(()=>Client.PassportHouseNumber)" />
+                                <br>
+                            </div>
+                            <div class="col-sm">
+                                <MudTextField @bind-Value="@Client.PassportAparmentNumber" Label="Квартира" Variant="Variant.Outlined" TextChanged="SaveState" />
+                                <ValidationMessage For="@(()=>Client.PassportAparmentNumber)" />
+                                <br>
+                            </div>
+                        </div>-->
+                        @*else
+                        {
+                            Client.PassportRegion = Client.Region;
+                            Client.PassportDistrict = Client.District;
+                            Client.PassportCity = Client.City;
+                            Client.PassportStreet = Client.Street;
+                            Client.PassportHouseNumber = Client.HouseNumber;
+                            Client.PassportAparmentNumber = Client.AparmentNumber;
+                        }*@
+                        <!--<div class="block">
+                            <MudButton @onclick="PartialSubmitValidForm1" Variant="@Variant.Filled" Color="Color.Primary">Далее</MudButton>
+                        </div>
+
+                        <br />
+                    </div>-->
+                    @*}*@
+
+
+
+
+
+                <!--</MudTabPanel>
+
+
+
+
+                <MudTabPanel Text="Загрузка фото" Icon="@Icons.Material.Filled.AddAPhoto" Disabled="false" @ref="panel03">
+
+                    <div class="block">
+                        <div class="row">
+                            <div class="col-sm">
+                                <h3>Сделайте фото паспорта с лицевой стороны и загрузите фото</h3>
+                                <p>(пример фото)</p>
+                                <div class="top-center"><img src="passport1.png" class="img-fluid"></div>
+
+                                <MatFileUpload OnChange="OnInputFileChange1" Label="Выберите или перетащите изображение..."></MatFileUpload>
+
+                                <span style="color:crimson">@fileExeptionForPic1</span>
+
+                                <p>@fileName1</p>
+
+                                <ValidationMessage For="@(()=>Client.Img.Pic1)" />
+
+                            </div>
+                            <div class="col-sm">
+                                <h3>Сделайте фото паспорта с обратной стороны и загрузите фото</h3>
+                                <p>(пример фото)</p>
+                                <div class="top-center"><img src="passport2.png" class="img-fluid"></div>
+
+                                <MatFileUpload OnChange="OnInputFileChange2" Label="Выберите или перетащите изображение..."></MatFileUpload>
+
+                                <span style="color:crimson">@fileExeptionForPic2</span>
+
+                                <p>@fileName2</p>
+
+                                <ValidationMessage For="@(()=>Client.Img.Pic2)" />
+                            </div>
+                            <div class="col-sm">
+                                <h3>Сделайте ваше личное фото с паспоротом в руке и загрузите фото</h3>
+                                <p>(пример фото)</p>
+                                <div class="top-center"><img src="passport3.png" class="img-fluid"></div>
+
+                                <MatFileUpload OnChange="OnInputFileChange3" Label="Выберите или перетащите изображение..."></MatFileUpload>
+
+                                <span style="color:crimson">@fileExeptionForPic3</span>
+
+                                <p>@fileName3</p>
+
+
+                                <ValidationMessage For="@(()=>Client.Img.Pic3)" />
+                            </div>
+                        </div>
+
+                        <br />
+
+                        <div class="block">
+                            <div class="row">
+                                <div class="col-sm">
+                                    <MudTextField @bind-Value="@Client.Number1" Label="Номер телефона" HelperText="Без '0' и '996'. Пример: 555123456" Variant="Variant.Outlined" TextChanged="SaveState" />
+                                    <ValidationMessage For="@(()=>Client.Number1)" />
+                                    <br>
+                                </div>
+                                <div class="col-sm">
+                                    <MudTextField @bind-Value="@Client.Number2" Label="Номер WhatsApp" HelperText="Без '0'  и '996'. Пример: 555123456" Variant="Variant.Outlined" TextChanged="SaveState" />
+                                    <ValidationMessage For="@(()=>Client.Number2)" />
+                                    <br>
+                                </div>-->
+                                @*<div class="col-sm">
+                                    <MudSelect T="string" @bind-Value="Client.Type" Label="Выберите услугу" Strict="true" Variant="Variant.Outlined" Format="F2" SelectedValuesChanged="SaveState">
+                                        <MudSelectItem T="string" Value="@("Кредит")" />
+                                        <MudSelectItem T="string" Value="@("Депозит")" />
+                                    </MudSelect>
+                                    <ValidationMessage For="@(()=>Client.Type)" />
+                                </div>*@
+                            <!--</div>
+                        </div>-->
+                        @*<div class="block">
+                            @if (Client.Type == "Кредит")
+                            {
+                                <div class="row">
+                                    <div class="col-sm">
+                                        <label>Сумма: @Client.CreditSum KGS</label>
+                                        <MatSlider @bind-Value="@Client.CreditSum" Step="1000" EnableStep="true" ValueMin="2000" ValueMax="100000" Markers="true" TValue="decimal">Сумма: @Client.CreditSum KGS</MatSlider>
+                                    </div>
+                                    <div class="col-sm">
+                                        <label>Количество месяцев: @Client.CreditTime</label>
+                                        <MatSlider @bind-Value="@Client.CreditTime" Step="1" EnableStep="true" ValueMin="1" ValueMax="36" Markers="true" TValue="int">Сумма: @Client.CreditTime</MatSlider>
+                                    </div>
+                                </div>
+                            }
+                        </div>*@
+
+                        <!--<div class="block">
+                            <MudButton Variant="@Variant.Filled" Color="Color.Primary" OnClick="() => Activate(panel02)">Назад</MudButton>
+                            <MudButton @onclick="ProcessResult" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Отправить</MudButton>
+                            <br />
+                        </div>-->
+                        @*@if (ProgressStatus)
+                        {
+                            <div class="block">
+                                <MudProgressLinear Color="Color.Primary" Value="@ValueProgressBar" Class="my-7" />
+                            </div>
+                        }*@
+
+                    <!--</div>
+
+                </MudTabPanel>
+            </MudTabs>
+
+        </EditForm>-->
+        <MudOverlay Visible="isVisible" LightBackground="true" Absolute="true">
+            <MudProgressCircular Color="Color.Secondary" Indeterminate="true" />
+        </MudOverlay>
+    </MudContainer>
+</MatThemeProvider>

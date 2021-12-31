@@ -1,0 +1,135 @@
+﻿@inherits LayoutComponentBase
+
+
+<MudThemeProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+    <MudAppBar Elevation="1">
+        @*<MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />*@
+        <a href="https://salymfinance.kg/">
+            <Identification.Server.Pages.SvgHolder>
+                <Identification.Server.Pages.SvgLogo />
+            </Identification.Server.Pages.SvgHolder>
+        </a>
+        <MudSpacer />
+
+    </MudAppBar>
+    @*<MudDrawer @bind-Open="_drawerOpen" Elevation="1">
+            <MudDrawerHeader>
+                <MudText Typo="Typo.h6">MudBlazorTemplates1</MudText>
+            </MudDrawerHeader>
+            <NavMenu />
+        </MudDrawer>*@
+    <MudMainContent>
+        <MudContainer MaxWidth="MaxWidth.Large" Class="my-16 pt-16">
+            @Body
+        </MudContainer>
+    </MudMainContent>
+    @*<footer class="modal-footer">
+            <p>ОАО МФК "Салым Финанс" © 2007-2021</p>
+        </footer>*@
+    <footer class="footer">
+        <div class="footer-top">
+            <div class="container">
+                <div class="footer-top__content">
+                    <div class="footer-top_contact">
+             
+                        <div class="contact-block">
+                            <h4>Приемная</h4>
+                            <ul>
+                                <li><a href="tel:0 (312) 610 513">0 (312) 610 513</a></li>
+                                <li><a href="tel:0 (550) 781 537">0 (550) 781 537</a></li>
+                            </ul>
+                        </div>
+                        <div class="contact-block">
+                            <h4>По вопросам кредитования и депозитов</h4>
+                            <ul>
+                                <li><a href="tel:0 (555) 781 556">0 (555) 781 556</a></li>
+                                <li><a href="tel:0 (700) 781 556">0 (700) 781 556</a></li>
+                                <li><a href="tel:0 (777) 781 556">0 (777) 781 556</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-center">
+            <div class="container">
+                <div class="footer-center__content">
+                    <div class="footer-center__block">
+                        <h4>Кредиты</h4>
+                        <ul>
+                            <li><a href="https://salymfinance.kg/ru/credit/">Все кредиты</a></li>
+                            <li><a href="https://salymfinance.kg/ru/credit/ipoteka">Ипотека</a></li>
+                            <li><a href="https://salymfinance.kg/ru/credit/credit-za-chas">Кредит за час</a></li>
+                            <li><a href="https://salymfinance.kg/ru/credit/credit-na-obrazovanie">Кредит на образование</a></li>
+                            <li><a href="https://salymfinance.kg/ru/credit/teplo-i-comfort">Кредит "Тепло и Комфорт"</a></li>
+                            <li><a href="https://salymfinance.kg/ru/credit/potrebitelskij-kredit">Потребительский кредит</a></li>
+                            <li><a href="https://salymfinance.kg/ru/credit/agrocredit">Агрокредит</a></li>
+                            <li><a href="https://salymfinance.kg/ru/credit/stroitelstvo-i-remont">Кредит "Строительство и ремонт"</a></li>
+                            <li><a href="https://salymfinance.kg/ru/credit/business-credit">На развитие бизнеса</a></li>
+                            <li><a href="https://salymfinance.kg/ru/credit/Business-Mortgage">Бизнес-Ипотека</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-center__block">
+                        <h4>О компании</h4>
+                        <ul>
+                            <li><a href="https://salymfinance.kg/ru/about/company/">О нас</a></li>
+                            <li><a href="https://salymfinance.kg/ru/about/partners/">Партнеры</a></li>
+                            <li><a href="https://salymfinance.kg/ru/about/shareholders/">Акционеры</a></li>
+                            <li><a href="https://salymfinance.kg/ru/about/social/">Социальная ответственность</a></li>
+                            <li><a href="https://salymfinance.kg/ru/about/license/">Лицензии</a></li>
+                            <li><a href="https://salymfinance.kg/ru/report/">Отчетность</a></li>
+                            <li><a href="https://salymfinance.kg/ru/contacts/">Контакты</a></li>
+                            <li><a href="https://salymfinance.kg/ru/about/vacancy-list/">Вакансии</a></li>
+                            <li><a href="https://salymfinance.kg/ru/about/news/">Новости</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-center__block">
+                        <h4>Ценные бумаги</h4>
+                        <div class="mitap-block">
+                            <ul>
+                                <li><a href="https://salymfinance.kg/ru/bonds/">Облигации</a></li>
+                                <li><a href="https://salymfinance.kg/ru/shares/">Акции</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="footer-center__block">
+                        <h4>Реквизиты</h4>
+                        <div class="mitap-block">
+                            <ul>
+                                <li><a href="https://salymfinance.kg/ru/branch-network/?filter=all">Филиальная сеть</a></li>
+                                <li><a href="https://salymfinance.kg/ru/bank-details/">Банковские реквизиты</a></li>
+                            </ul>
+                            <div class="social-link-all">
+                                <a class="insta" href="https://www.instagram.com/salymfinancekg/">Instagram</a>
+                                <a class="facebook" href="https://www.facebook.com/salymfinance/">Facebook</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="container">
+                <div class="footer-bottom__content">
+                    <span>ОАО МФК "Салым Финанс" © 2007-2021</span>
+                    <a class="look" target="_blank" href="https://salymfinance.kg/media/Prosedure_for_consideration_applications.pdf"><span>Процедура рассмотрения обращения потребителей</span></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</MudLayout>
+
+@code
+{
+    bool _drawerOpen = true;
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+}
+

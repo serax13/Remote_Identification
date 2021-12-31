@@ -1,0 +1,116 @@
+﻿@page "/Registration"
+
+@using Identification.Server.Services
+@using Microsoft.AspNetCore.Hosting
+@using Microsoft.Extensions.Options
+@using Microsoft.Extensions.Logging
+@using System
+@using System.Threading
+@using System.ComponentModel.DataAnnotations
+
+@*@implements IDisposable*@
+
+
+@inject IOptions<ReCAPTCHASettings> GoogleReCAPT
+@inject HttpClient Http
+@inject ISnackbar Snackbar
+@inject IWebHostEnvironment _env
+@inject IJSRuntime JsRuntime
+@inject NavigationManager NavigationManager
+@inject ProtectedSessionStorage ProtectedSessionStore
+@inject IDialogService DialogService
+
+
+<MudContainer Class="mt-16" MaxWidth="MaxWidth.Medium">
+    <MudText Typo="Typo.h3" Align="Align.Center" GutterBottom="true">Регистрация клиентов </MudText>
+    <EditForm Model="@cl" OnValidSubmit="OnValidSubmit" @ref="editForm">
+        <DataAnnotationsValidator />
+        <MudGrid Spacing="6" Class="mt-16">
+            <MudItem xs="12" sm="6">
+                <MudText Typo="Typo.h5" GutterBottom="true">Введите следуюущие данные</MudText>
+                <MudGrid>
+                    <MudItem xs="12">
+                        <MudTextField T="string" MaxLength="14" @bind-Value="cl.passportInn"
+                                      For="@(() => cl.passportInn)"
+                                      Label="Инн" HelperText="14 цифр" />
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudSelect T="string" @bind-Value="cl.TypeCode"
+                                   HelperText="Выберите из списка код кредита или депозита">
+                            <MudSelectItem Value="@("Кредит")" />
+                            <MudSelectItem Value="@("Депозит")" />
+                        </MudSelect>
+                    </MudItem>
+                    @if (cl.TypeCode == "Кредит")
+                    {
+                        <MudItem xs="12">
+                            <MudTextField T="string" @bind-Value="cl.codeNumber"
+                                          For="@(() => cl.codeNumber)"
+                                          Label="Код кредита"
+                                          HelperText="Пример: 10011111" />
+                        </MudItem>}
+                    @if (cl.TypeCode == "Депозит")
+                    {
+                        <MudItem xs="12">
+                            <MudTextField T="string" @bind-Value="cl.codeNumber"
+                                          For="@(() => cl.codeNumber)"
+                                          Adornment="Adornment.Start"
+                                          AdornmentText="d"
+                                          Label="Код депозита"
+                                          HelperText="Пример: 10011111" />
+                        </MudItem>}
+
+                    @if (btnStatus)
+                    {
+                        <MudItem xs="12" Class="d-flex justify-center">
+                            <MudButton ButtonType="ButtonType.Submit" Disabled="@(!context.IsModified()||!context.Validate())" Variant="Variant.Filled" DisableElevation="true" Color="Color.Primary" Size="Size.Large" Class="mt-8">Далее</MudButton>
+                        </MudItem>}
+
+                    @if (nextStep)
+                    {
+                        <MudItem xs="12">
+                            <MudTextField T="string" @bind-Value="cl.Password"
+                                          Label="Пароль"
+                                          InputType="@PasswordInput"
+                                          @ref="pwField1"
+                                          Adornment="Adornment.End"
+                                          AdornmentIcon="@PasswordInputIcon"
+                                          OnAdornmentClick="ShowPassword"
+                                          Validation="@(new Func<string, IEnumerable<string>>(PasswordStrength))" />
+                        </MudItem>
+                        <MudItem xs="12">
+                            <MudTextField T="string" @bind-Value="cl.PasswordCheck"
+                                          Label="Повторите пароль"
+                                          InputType="@PasswordInput"
+                                          Adornment="Adornment.End"
+                                          AdornmentIcon="@PasswordInputIcon"
+                                          OnAdornmentClick="ShowPassword"
+                                          Validation="@(new Func<string, string>(PasswordMatch))" />
+                        </MudItem>
+                        <MudItem xs="12" Class="d-flex justify-center">
+                            <MudAlert Severity="Severity.Warning">Внимание длина пароля должна быть не менее 6-ти символов и должен содержать латиниские буквы и цифры!</MudAlert>
+                        </MudItem>
+                        <MudItem xs="12" Class="d-flex justify-center">
+                            <MudButton @onclick="CreateAccount" Variant="Variant.Filled" Disabled="@(!context.Validate())" DisableElevation="true" Color="Color.Primary" Size="Size.Large" Class="mt-8">Регистрация</MudButton>
+                        </MudItem>}
+
+                </MudGrid>
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <MudText Typo="Typo.h5" GutterBottom="true">Инструкция</MudText>
+                <div class="d-flex">
+                    <MudAlert Severity="Severity.Info">
+                        <MudText Style="text-align:justify">
+                            Введите свой ИНН, код кредита или депозита. Далее, если система определит, что вы являетесь нашим клиентом, необходимо придумать пароль для входа, <MudChip Variant="Variant.Text" Color="Color.Primary"><b>в качестве логина будет использоваться ваш ИНН.</b></MudChip> В случае если, при корректоном вводе всех данных, система по прежнему не определяет клиента, необходимо связаться с тех поддержкой по номеру <b>0 (555) 781 556 </b> или воспользоваться онлайн консультацией.
+                        </MudText>
+                    </MudAlert>
+                </div>
+            </MudItem>
+        </MudGrid>
+    </EditForm>
+    <MudOverlay Visible="isVisible" LightBackground="true" Absolute="true">
+        <MudProgressCircular Color="Color.Primary" Size="Size.Large" Indeterminate="true" />
+    </MudOverlay>
+
+</MudContainer>
+

@@ -1,0 +1,87 @@
+﻿@page "/register"
+@using Identification.Panel.Data
+@using Identification.Panel.Services
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject Blazored.LocalStorage.ILocalStorageService localStorageService
+@inject IUserService userService
+@layout LoginLayout
+@*@attribute [Authorize(Roles ="Admin")]*@
+
+<EditForm class="form-signin" OnValidSubmit="RegisterUser" Model="user">
+    <DataAnnotationsValidator />
+    <label style="color:crimson">@LoginMesssage</label>
+
+    <label for="inputUsername" class="sr-only">User Name</label>
+    <MudTextField T="string" id="inputUsername" @bind-Value="user.Login" Label="Логин" Variant="Variant.Text"></MudTextField>
+    <ValidationMessage For="@(() => user.Login)" />
+
+    <label for="inputPassword" class="sr-only">Password</label>
+    <MudTextField id="inputPassword" @bind-Value="@user.Password" Label="Пароль" Variant="Variant.Text" InputType="@PasswordInput" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="TogglePasswordVisibility" />
+    <ValidationMessage For="@(() => user.Password)" />
+
+    <label for="inputPasswordConfirm" class="sr-only">Password Confirmation</label>
+    <MudTextField id="inputPasswordConfirm" @bind-Value="@user.PasswordConfirm" Label="Пароль" Variant="Variant.Text" InputType="@PasswordInput" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="TogglePasswordVisibility" />
+    <ValidationMessage For="@(() => user.PasswordConfirm)" />
+
+    <label for="Role Select" class="sr-only">Password Role Select</label>
+    <MudTextField id="RoleSelect" @bind-Value="@user.RoleUsersId" Label="Role" Variant="Variant.Text" />
+    <ValidationMessage For="@(() => user.RoleUsersId)" />
+
+
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Создать</button>
+
+    <NavLink href="login">
+        <h6 class="font-weight-normal text-center">Войти</h6>
+    </NavLink>
+</EditForm>
+
+
+@code{
+
+    private Users user;
+    public string LoginMesssage { get; set; } 
+    bool PasswordVisibility;
+    InputType PasswordInput = InputType.Password;
+    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+
+    protected override Task OnInitializedAsync()
+    {
+        user = new Users();
+        return base.OnInitializedAsync();
+    }
+
+    void TogglePasswordVisibility()
+    {
+        @if (PasswordVisibility)
+        {
+            PasswordVisibility = false;
+            PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+            PasswordInput = InputType.Password;
+        }
+        else
+        {
+            PasswordVisibility = true;
+            PasswordInputIcon = Icons.Material.Filled.Visibility;
+            PasswordInput = InputType.Text;
+        }
+    }
+
+    private async Task<bool> RegisterUser()
+    {
+        //assume that user is valid
+        var returnedUser = await userService.RegisterUserAsync(user);
+
+        if (returnedUser != null)
+        {
+            await((CustomAuthentificationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(returnedUser);
+            NavigationManager.NavigateTo("/");
+        }
+        else
+        {
+            LoginMesssage = "Пользователь уже существует!";
+        }
+
+        return await Task.FromResult(true);
+    }
+}

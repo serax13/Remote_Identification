@@ -1,0 +1,93 @@
+﻿@page "/login"
+
+@using Identification.Panel.Data
+
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject Blazored.LocalStorage.ILocalStorageService localStorageService
+@inject IUserService userService
+@inject IJSRuntime jsRunTime
+
+@layout LoginLayout
+
+<EditForm Model="user" OnValidSubmit="ValidateUser">
+    <label style="color:crimson">@LoginMesssage</label>
+    <label for="inputUsername" class="sr-only">Логин</label>
+    <MudTextField T="string" id="inputUsername" @bind-Value="user.Login" Label="Логин" Variant="Variant.Text"></MudTextField>
+
+    <label for="inputPassword" class="sr-only">Пароль</label>
+    <MudTextField id="inputPassword" @bind-Value="@user.Password" Label="Пароль" Variant="Variant.Text" InputType="@PasswordInput" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="TogglePasswordVisibility" />
+
+    <div class="form-check m-3">
+        <MudCheckBox T="bool" id="inputRememberMe" Label="Remember me?" Color="Color.Primary" @bind-Value="user.RememberMe" Class="ml-n1 my-3"></MudCheckBox>
+        <label class="form-check-label" for="inputRememberMe">Запомнить</label>
+    </div>
+
+    <button class="btn btn-lg btn-primary btn-block" type="submit">
+        <MudFab Label="Войти" />
+    </button>
+</EditForm>
+
+
+@code{
+
+    private Users user;
+    public string LoginMesssage { get; set; }
+    bool PasswordVisibility;
+    InputType PasswordInput = InputType.Password;
+    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+
+
+    ClaimsPrincipal claimsPrincipal;
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        user = new Users();
+
+        claimsPrincipal = (await authenticationStateTask).User;
+
+        if (claimsPrincipal.Identity.IsAuthenticated)
+        {
+            NavigationManager.NavigateTo("/index");
+        }
+    }
+
+    private async Task<bool> ValidateUser()
+    {
+        //assume that user is valid
+        //call an API
+
+        var returnedUser = await userService.LoginAsync(user);
+
+        if (returnedUser.Login != null)
+        {
+            await ((CustomAuthentificationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(returnedUser);
+            NavigationManager.NavigateTo("/");
+        }
+        else
+        {
+            LoginMesssage = "Invalid username or password";
+        }
+
+        return await Task.FromResult(true);
+    }
+
+    void TogglePasswordVisibility()
+    {
+        @if (PasswordVisibility)
+        {
+            PasswordVisibility = false;
+            PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+            PasswordInput = InputType.Password;
+        }
+        else
+        {
+            PasswordVisibility = true;
+            PasswordInputIcon = Icons.Material.Filled.Visibility;
+            PasswordInput = InputType.Text;
+        }
+     }
+}

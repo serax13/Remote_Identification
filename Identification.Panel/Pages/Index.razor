@@ -1,0 +1,73 @@
+﻿@page "/"
+@attribute [Authorize]
+@inject IDialogService Dialog
+@using Identification.Panel.Data
+@using Identification.Panel.Services
+
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-16">
+    <AuthorizeView>
+        <Authorized>
+            <MudText Typo="Typo.h3" GutterBottom="true">Добро пожаловать!</MudText>
+        </Authorized>
+        <NotAuthorized>
+
+        </NotAuthorized>
+    </AuthorizeView>
+    
+    <MudText Class="mb-8"></MudText>
+    <MudTable Items="clients" Hover="true" SortLabel="Sort By">
+        <HeaderContent>
+            <MudTh><MudTableSortLabel SortBy="new Func<Client, object>(x=>x.Id)">Номер клиента</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Client, object>(x=>x.FirstName)">Имя</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Client, object>(x=>x.LastName)">Фамилия</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Client, object>(x=>x.MidName)">Отчество</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Client, object>(x=>x.Number1)">Номер телефона</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Client, object>(x=>x.Status)">Статус заявки</MudTableSortLabel></MudTh>
+            <MudTh>Редактировать</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Номер клиента">@context.Id</MudTd>
+            <MudTd DataLabel="Имя">@context.FirstName</MudTd>
+            <MudTd DataLabel="Фамилия">@context.LastName</MudTd>
+            <MudTd DataLabel="Отчество">@context.MidName</MudTd>
+            <MudTd DataLabel="Номер телефона">@context.Number1</MudTd>
+            <MudTd DataLabel="Статус заявки">
+            @if (context.Status == 3)
+            {
+                <p>Не принята</p>
+            }
+            else
+            { 
+                <p>Принята</p>
+            }
+            </MudTd>
+            <MudTd DataLabel="Редактировать"><MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.ModeEdit" IconColor="Color.Primary" Size="Size.Large" OnClick="@(() => OpenDialog(parameters, maxWidth, context.Id))">Редактировать</MudButton></MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[]{50, 100}" />
+        </PagerContent>
+    </MudTable>
+</MudContainer>
+
+@code
+{
+    [Inject]
+    IClientService ClientService { get; set; }
+
+    public List<Client> clients = new List<Client>();
+
+    DialogOptions maxWidth = new DialogOptions() { MaxWidth = MaxWidth.ExtraLarge, FullWidth = true};
+    DialogParameters parameters = new DialogParameters();
+
+    protected override async Task OnInitializedAsync()
+    {
+        clients = await ClientService.GetAll("api/clients");
+    }
+
+    private void OpenDialog(DialogParameters parameters, DialogOptions options, int id)
+    {
+        parameters.Add("ClientId", id);
+        Dialog.Show<Dialog>($"Редактирование клиента: {id}", parameters, options);
+    }
+}

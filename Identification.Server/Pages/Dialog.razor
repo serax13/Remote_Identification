@@ -1,0 +1,39 @@
+﻿@inject NavigationManager NavigationManager
+
+<MudDialog>
+    <DialogContent>
+        <MudContainer Style="max-height: 300px; overflow-y: scroll">
+            <MudText Style="white-space: pre-wrap;">@ContentText</MudText>
+        </MudContainer>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Отмена</MudButton>
+        @if (Type == "Default")
+        {
+            <MudButton Color="@Color" Variant="Variant.Filled" OnClick="Submit">@ButtonText</MudButton>
+        }
+        @if (Type == "RedirectLogin")
+        {
+            <MudButton Color="@Color" Variant="Variant.Filled" OnClick="RedirectToLogin">@ButtonText</MudButton>
+        }
+
+    </DialogActions>
+</MudDialog>
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public string ContentText { get; set; }
+
+    [Parameter] public string ButtonText { get; set; }
+
+    [Parameter] public Color Color { get; set; }
+    [Parameter] public string Type { get; set; }
+
+
+    void Submit() => MudDialog.Close(DialogResult.Ok(true));
+    void Cancel() => MudDialog.Cancel();
+    void RedirectToLogin()
+    {
+        NavigationManager.NavigateTo("https://ib.salymfinance.kg/");
+    }
+}
